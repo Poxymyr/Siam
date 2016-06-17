@@ -17,12 +17,24 @@ require(['js/config.js'], function(config) {
 
       this.grid.x = config.TILE_SIZE*2;
       this.grid.y = config.TILE_SIZE;
+      this.gridBorders.x = config.TILE_SIZE*2;
+      this.gridBorders.y = config.TILE_SIZE;
 
       for(var c = 0; c < 5; c++) {
         for(var r = 0; r < 5; r++) {
           this.grid.create(c*config.TILE_SIZE, r*config.TILE_SIZE, 'cell');
         }
+
+        this.gridBorders.create(c*config.TILE_SIZE, -1*config.TILE_SIZE, 'highlight');
+        this.gridBorders.create(c*config.TILE_SIZE, 5*config.TILE_SIZE, 'highlight');
       }
+
+      for(var r = 0; r < 5; r++) {
+        this.gridBorders.create(-1*config.TILE_SIZE, r*config.TILE_SIZE, 'highlight');
+        this.gridBorders.create(5*config.TILE_SIZE, r*config.TILE_SIZE, 'highlight');
+      }
+
+      this.gridBorders.setAll('visible', false);
 
       var sprite = null;
       for(var i = 0; i < 5; i++) {
@@ -30,14 +42,19 @@ require(['js/config.js'], function(config) {
         sprite.inputEnabled = true;
         sprite.input.enableDrag();
         sprite.input.enableSnap(config.TILE_SIZE, config.TILE_SIZE, false, true);
-        sprite.events.onDragStart.add(this.highlightGridBorders, sprite);
+        sprite.events.onDragStart.add(this.highlightGridBorders, this);
+        sprite.events.onDragStop.add(this.unhighlightGridBorders, this);
       }
     },
 
     update: function() {},
 
     highlightGridBorders: function() {
-      console.log(Siam);
+      this.gridBorders.setAll('visible', true);
+    },
+
+    unhighlightGridBorders: function() {
+      this.gridBorders.setAll('visible', false);
     }
   };
 
