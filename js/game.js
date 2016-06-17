@@ -38,22 +38,33 @@ require(['js/config.js'], function(config) {
 
       var sprite = null;
       for(var i = 0; i < 5; i++) {
-        sprite = this.add.sprite(0, (i+1)*config.TILE_SIZE, 'elephant');
+        sprite = this.add.sprite(config.TILE_SIZE/2, (i+1.5)*config.TILE_SIZE, 'elephant');
+        sprite.anchor = {x: 0.5, y: 0.5};
+        sprite.scale = {x: 0.95, y: 0.95};
         sprite.inputEnabled = true;
         sprite.input.enableDrag();
-        sprite.input.enableSnap(config.TILE_SIZE, config.TILE_SIZE, false, true);
-        sprite.events.onDragStart.add(this.highlightGridBorders, this);
-        sprite.events.onDragStop.add(this.unhighlightGridBorders, this);
+        sprite.input.useHandCursor = true;
+        sprite.input.enableSnap(config.TILE_SIZE, config.TILE_SIZE, true, true, config.TILE_SIZE/2, config.TILE_SIZE/2);
+        sprite.events.onDragStart.add(this.highlightGridBorders, this, sprite);
+        sprite.events.onDragStop.add(this.unhighlightGridBorders, this, sprite);
       }
     },
 
     update: function() {},
 
-    highlightGridBorders: function() {
+    highlightGridBorders: function(sprite) {
       this.gridBorders.setAll('visible', true);
     },
 
-    unhighlightGridBorders: function() {
+    unhighlightGridBorders: function(sprite) {
+      for(var index in this.gridBorders.children) {
+        if(sprite.overlap(this.gridBorders.getChildAt(index))) {
+          this.gridBorders.setAll('visible', false);
+          return;
+        }
+      }
+
+      sprite.position = sprite.input.dragStartPoint;
       this.gridBorders.setAll('visible', false);
     }
   };
